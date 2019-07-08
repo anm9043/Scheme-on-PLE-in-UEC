@@ -20,3 +20,12 @@
           )
     )
   )
+
+(define map-tree2
+  (lambda(fn tree)
+    (cond ((null? tree) '())
+          ((pair? tree)(lambda(t) (map-tree2 fn t)))
+          (else (fn tree))
+          )
+    )
+  )
