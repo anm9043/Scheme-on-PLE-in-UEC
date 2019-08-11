@@ -23,4 +23,5 @@
 (define get-depth
   (lambda (famtre depth)
     (cond ((or (null? famtre) (< depth 1)) '())
-          ((pair? famtre) (map (lambda (t) (get-depth t (- depth 1))) famtre)
+          ((pair? famtre) (map (lambda (t) (get-depth t (- depth 1))) famtre))
+          (else (map car famtre)))))
