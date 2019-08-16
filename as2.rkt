@@ -1,22 +1,3 @@
-(define fam '(A (B1 (C1)
-                    (C2))
-                (B2)
-                (B3 (C3 (D1)
-                        (D1)))))
-
-(define fam1 '(a (b1 (c1)
-                     (c2 (d1)
-                         (d2 (e1)
-                             (e2))
-                         (d3)))
-                 (b2)
-                 (b3 (c3 (d4)
-                         (d5))
-                     (c4))
-                 (b3 (c5 (d6 (e3 (f1)
-                                 (f2))
-                             (e4))))))
-
 (define kakeizu
   (read (open-input-file "kakeizu")))
 
@@ -31,8 +12,27 @@
             (loop (- i 1)(cdr t))
             (car (cdr t))))))
 
-(define get-depth
-  (lambda (famtre depth)
-    (cond ((or (null? famtre) (< depth 1)) '())
-          ((pair? famtre) (map (lambda (t) (get-depth t (- depth 1))) famtre))
-          (else (map car famtre)))))
+(define (nos tree) ;the Number Of Sons
+  (length (sons tree)))
+
+(define (make-grandsons-tree tree)
+  (let ((result (list (car tree))))
+    (let loop ((i 1))
+      (if (<= i (nos tree))
+          (begin (set! result (append result (cdr (subtree i tree))))
+                 (loop (+ i 1)))
+          #f))
+    result))
+
+(define (get-depth tree depth)
+  (let ((result '()))
+    (cond ((<= depth 0)(set! result (list (car tree))))
+          ((= depth 1)(set! result (append result (sons tree))))
+          ((= depth 2) ;depth >= 2の時
+           (let loop ((t tree)(i 1))
+             (if (<= i (nos t))
+                 (begin (set! result (append result (sons (subtree i t))))
+                        (loop t (+ i 1)))
+                 #f)))
+          (else (set! result (append result (get-depth (make-grandsons-tree tree) (- depth 1))))))
+    result))
