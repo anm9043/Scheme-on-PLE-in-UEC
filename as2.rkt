@@ -15,7 +15,7 @@
 (define (nos tree) ;the Number Of Sons
   (length (sons tree)))
 
-(define (make-grandsons-tree tree)
+(define (make-grandsons-tree tree);孫を子とみなしたような木を作る
   (let ((result (list (car tree))))
     (let loop ((i 1))
       (if (<= i (nos tree))
