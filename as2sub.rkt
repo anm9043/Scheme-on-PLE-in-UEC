@@ -110,3 +110,13 @@
                  #f)))
           (else (set! result (append result (get-depth (make-grandsons-tree tree) (- depth 1))))))
     result))
+
+(define (get-cousin tree item)
+  (let loop ((i 0))
+    (let ((l (get-depth tree i)))
+      (if (null? l)
+          #f
+          (if (member item l)
+              l
+              (loop (+ i 1)))))))
+  
