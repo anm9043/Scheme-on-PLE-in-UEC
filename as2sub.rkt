@@ -119,4 +119,48 @@
           (if (member item l)
               l
               (loop (+ i 1)))))))
+
+(define (get-generation tree item)
+  (let loop ((i 0))
+    (let ((l (get-depth tree i)))
+      (if (null? l)
+          #f
+          (if (member item l)
+              i
+              (loop (+ i 1)))))))
+(define (get-descendant-tree tree num) ;make-grandsons-treeをnum回繰り返す
+  (let loop ((t tree)(i num))
+    (if (= i 0)
+        t
+        (loop (make-grandsons-tree t)(- i 1)))))
+        
   
+
+(define (get-father tree item)
+  (let ((generation (get-generation tree item)))
+    (if (not generation)
+        #f
+        (cond ((= generation 0) '())
+              ((= generation 1) (car tree))
+              (else
+               (let* ((uncles-tree (get-descendant-tree tree (- generation 2)))
+                      (uncles (nos uncles-tree)))
+                 (let loop ((i 1))
+                   (let ((t (subtree i uncles-tree)))
+                     (if (member item (sons t))
+                         (car t)
+                         (if (< i uncles)
+                             (loop (+ i 1))
+                             #f))))))))))
+
+(define (get-path tree item)
+  (let ((generation (get-generation tree item)))
+    (if (not generation)
+        #f
+        (let ((result (list item)))
+          (let loop ((g generation)
+                     (i item))
+            (if (<= g 0)
+                result
+                (begin (set! result (cons (get-father tree i) result))
+                       (loop (- g 1) (get-father tree i)))))))))
