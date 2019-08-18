@@ -6,7 +6,7 @@
       1
       (* num (! (- num 1)))))
 
-(define ex1 '(+ (** x 2)(* 4 x)3))
+
 
 (define (diff expression)
   (cond ((number? expression) 0)
@@ -36,4 +36,38 @@
   (let ((derivative (derivative expression num))
         (value (value expression num)))
     `(+ (* ,derivative x),(- value (* derivative num)))))
+
+;ここまで「その2」．ここから「その3」
+
+
+(define (diff2 expression var)
+  (cond ((or (number? expression)
+             (and (symbol? expression)(not (equal? expression var))))
+         0)
+        ((equal? expression var) 1)
+        ((equal? '+ (car expression))
+         (cons '+ (let loop ((e (cdr expression)))
+                    (if (null? e)
+                        '()
+                        (cons (diff2 (car e) var)(loop (cdr e)))))))
+        ((equal? '- (car expression))
+         (cons '- (let loop ((e (cdr expression)))
+                    (if (null? e)
+                        '()
+                        (cons (diff2 (car e) var)(loop (cdr e)))))))
+        ((equal? '* (car expression))
+         `(+ (* ,(cadr expression),(diff2 (caddr expression) var))
+             (* ,(diff2 (cadr expression) var),(caddr expression))))
+        ((equal? '** (car expression))
+         `(* ,(caddr expression)
+             (* ,(diff2 (cadr expression) var)
+                (** ,(cadr expression),(- (caddr expression) 1)))))
+        (else #f)))
+
+(define ex1 '(+ (** x 2)(* 4 x)3))
+(define ex2 '(+ y z))
+(define ex3 '(+ (* 3 (* (** x 3)(** y 2)))(* 5 (*(** x 2)(** y 3)))(* 2 x) y))
+(define ex4 '(* 3 (* x y)))
+(define ex5 '(* 5 (* (** x 3)(** y 2))))
+(define ex6 '(+ (* 5 (* (** x 3)(** y 2))) x y 3))
 
