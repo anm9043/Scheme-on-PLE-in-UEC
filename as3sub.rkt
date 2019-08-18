@@ -5,6 +5,9 @@
   (if (<= num 0)
       1
       (* num (! (- num 1)))))
+
+(define ex1 '(+ (** x 2)(* 4 x)3))
+
 (define (diff expression)
   (cond ((number? expression) 0)
         ((equal? expression 'x) 1)
@@ -20,4 +23,17 @@
              (* ,(diff (cadr expression))
                 (** ,(cadr expression),(- (caddr expression) 1)))))
         (else #f)))
+
+;ここまで「その1」．ここから「その2」
+(define (value expression num) ;expressionにnumを代入した値を求める
+  ((eval `(lambda (x) ,expression)(interaction-environment)) num))
+
+(define (derivative expression num) ;expressionのnumにおける微分係数を求める
+  (let ((dfx (diff expression)))
+    ((eval `(lambda (x) ,dfx)(interaction-environment)) num)))
+
+(define (tangent expression num)
+  (let ((derivative (derivative expression num))
+        (value (value expression num)))
+    `(+ (* ,derivative x),(- value (* derivative num)))))
 
